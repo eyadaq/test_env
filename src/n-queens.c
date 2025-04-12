@@ -2,6 +2,22 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+void printBoard(int **board, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (board[i][j])
+                printf("Q ");
+            else
+                printf(". ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 int isValidSolution(int *cols, int *diag1, int *diag2, int n, int row, int col)
 {
     // Check if the column or diagonals are already attacked
@@ -18,8 +34,11 @@ void solve(int **board, int n, int row, int *count, int *cols, int *diag1, int *
     if (row == n)
     {
         (*count)++;
+        printf("Solution %d:\n", *count);
+        printBoard(board, n);
         return;
     }
+    
 
     for (col = 0; col < n; col++)
     {
@@ -99,9 +118,9 @@ int totalNQueens(int n)
     return (count);
 }
 
-int main()
+int main(int argc , char *argv[])
 {
-    int n = 8;
+    int n = atoi(argv[1]);
     printf("Total solutions for n=%d: %d\n", n, totalNQueens(n));
     return 0;
 }
