@@ -2,125 +2,127 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-void printBoard(int **board, int n)
+int     isSolved(int col, int row, int n ,int *cols, int *diag1, int *diag2)
 {
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            if (board[i][j])
-                printf("Q ");
-            else
-                printf(". ");
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-int isValidSolution(int *cols, int *diag1, int *diag2, int n, int row, int col)
-{
-    // Check if the column or diagonals are already attacked
-    if (cols[col] || diag1[row + col] || diag2[row - col + (n - 1)])
+    if (diag1[row + col] || cols[col] || diag2[row - col + ( n - 1)])
         return (0);
     return (1);
 }
 
-void solve(int **board, int n, int row, int *count, int *cols, int *diag1, int *diag2)
+void    ft_print_board(int **board, int n)
 {
-    int col;
+    int     i;
+    int     j;
 
-    // Base case: if we've placed queens in all rows
+    i = 0;
+    while (i < n)
+    {
+        j = 0;
+        while (j < n)
+        {
+            if (board[i][j] == 1)
+                write(1, "Q", 1);
+            else
+                write(1, ".", 1);
+            j++;
+        }
+        write(1, "\n", 1);
+        i++;
+    }
+    write(1, "\n", 1);
+}
+
+void    solve(int   **board, int n, int *count, int *cols, int *diag1, int *diag2, int row)
+{
+    int     col;
+
     if (row == n)
     {
         (*count)++;
-        printf("Solution %d:\n", *count);
-        printBoard(board, n);
-        return;
+        ft_print_board(board, n);
+        return ;
     }
     
-
-    for (col = 0; col < n; col++)
+    col = 0;
+    while (col < n)
     {
-        if (isValidSolution(cols, diag1, diag2, n, row, col))
+        if (isSolved(col, row, n , cols, diag1, diag2))
         {
-            // Place the queen at (row, col)
             cols[col] = 1;
-            diag1[row + col] = 1;
-            diag2[row - col + (n - 1)] = 1;
-            board[row][col] = 1;  // Mark the position
-
-            // Recursively place the next queen
-            solve(board, n, row + 1, count, cols, diag1, diag2);
-
-            // Backtrack: Remove the queen and reset the tracking arrays
+            diag1[col + row] = 1;
+            diag2[(row - col) + (n - 1)] = 1;
+            board[row][col] = 1;
+            solve(board, n, count, cols, diag1, diag2, row + 1);
             cols[col] = 0;
-            diag1[row + col] = 0;
-            diag2[row - col + (n - 1)] = 0;
-            board[row][col] = 0;  // Backtrack and unmark the position
+            diag1[col + row] = 0;
+            diag2[(row - col) + (n - 1)] = 0;
+            board[row][col] = 0;
         }
+        col++;
     }
 }
 
-int totalNQueens(int n)
-{
-    int **board;
-    int count = 0;
-    int *cols;
-    int *diag1;
-    int *diag2;
-    int i;
+int     totalNQueens(int n) {
+    
+    int     **board;
+    int     *diag1;
+    int     *diag2;
+    int     count;
+    int     *cols;
+    int     i;
+    int     j;
 
     if (n == 1)
-        return (1);  // Special case for 1x1 board
-
+        return (1);
     if (n == 2 || n == 3)
-        return (0);  // No solution for 2x2 or 3x3
-
-    // Allocate memory for the board
+        return (0);
     board = malloc(sizeof(int *) * n);
-    for (i = 0; i < n; i++)
+    i = 0;
+    while (i < n)
     {
         board[i] = malloc(sizeof(int) * n);
-        for (int j = 0; j < n; j++)
+        j = 0;
+        while(j < n)
+        {
             board[i][j] = 0;
+            j++;
+        }
+        i++;
     }
-
-    // Allocate arrays for column and diagonal checks
+    j = (2 * n) - 1;
+    diag1 = malloc(sizeof(int) * j);
+    diag2 = malloc(sizeof(int) * j);
     cols = malloc(sizeof(int) * n);
-    diag1 = malloc(sizeof(int) * (2 * n - 1));
-    diag2 = malloc(sizeof(int) * (2 * n - 1));
-
-    // Initialize all the tracking arrays to 0
-    for (i = 0; i < n; i++)
+    i = 0;
+    while (i  < n)
     {
         cols[i] = 0;
+        i++;
     }
-    for (i = 0; i < 2 * n - 1; i++)
+    i = 0;
+    while (i < j)
     {
         diag1[i] = 0;
-        diag2[i] = 0;
+        diag2[i] = 0; 
+        i++;
     }
-
-    // Start solving from the first row
-    solve(board, n, 0, &count, cols, diag1, diag2);
-
-    // Free the allocated memory
-    free(cols);
+    count = 0;
+    solve(board, n, &count, cols, diag1, diag2, 0);
     free(diag1);
     free(diag2);
-    for (i = 0; i < n; i++)
+    free(cols);
+    i = 0;
+    while (i < n)
     {
         free(board[i]);
+        i++;
     }
     free(board);
-
     return (count);
 }
 
-int main(int argc , char *argv[])
+int     main(int argc , char *argv[])
 {
-    int n = atoi(argv[1]);
-    printf("Total solutions for n=%d: %d\n", n, totalNQueens(n));
-    return 0;
+    printf("%d\n", totalNQueens(atoi(argv[1])));
+    return (0);
 }
