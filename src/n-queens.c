@@ -42,7 +42,6 @@ void    solve(int   **board, int n, int *count, int *cols, int *diag1, int *diag
         ft_print_board(board, n);
         return ;
     }
-    
     col = 0;
     while (col < n)
     {
